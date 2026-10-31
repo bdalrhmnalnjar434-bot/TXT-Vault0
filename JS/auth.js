@@ -2,7 +2,7 @@
 // ⚠️ هذا الملف يحمي تجربة الواجهة فقط. الحماية الحقيقية هي سياسات RLS في قاعدة البيانات
 // (sql/schema.sql)، فحتى لو تجاوز أحدهم الواجهة لن يستطيع قراءة ما لا يحق له.
 
-import { supabase, isConfigured } from "../../supabase.js";
+import { supabase, isConfigured } from "../supabase.js";
 
 export async function getSession() {
   const { data } = await supabase.auth.getSession();
