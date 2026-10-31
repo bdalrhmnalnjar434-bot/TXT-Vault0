@@ -12,7 +12,7 @@ export const SUPABASE_ANON_KEY = "sb_publishable_jZoqAZh23DpOsG5pSzKXsg_ZXvYfvq2
 
 // اسم البوت (بدون @) ورابط القناة — يظهران في صفحة الطالب
 export const TELEGRAM_BOT_USERNAME = "bdalrhmnalnjar434_2010_bot";
-export const TELEGRAM_CHANNEL_URL = "https://t.me/+CKQ8wu92r8o0Nzdk";
+export const TELEGRAM_CHANNEL_URL = "https://t.me/+inLoexMjf_I2ODQ0";
 
 export const isConfigured =
   !SUPABASE_URL.includes("YOUR-PROJECT-ID") && !SUPABASE_ANON_KEY.includes("YOUR-ANON");
