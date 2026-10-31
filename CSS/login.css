@@ -1,0 +1,23 @@
+/* صفحات الدخول وإنشاء الحساب */
+
+.auth-wrap { min-height: calc(100vh - 140px); display: grid; place-items: center; padding: 40px 0; }
+.auth-card { width: min(460px, 100%); padding: 32px; position: relative; overflow: hidden; }
+.auth-card.wide { width: min(560px, 100%); }
+.auth-card::before {
+  content: ""; position: absolute; inset-inline-end: -70px; top: -70px; width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, var(--teal-glow), transparent 70%); pointer-events: none;
+}
+.auth-card h1 { margin: 0 0 6px; font-size: 1.7rem; font-weight: 800; }
+.auth-card .sub { margin: 0 0 24px; color: var(--muted); }
+.auth-foot { margin-top: 20px; text-align: center; color: var(--muted); font-size: .95rem; }
+.pw-field { position: relative; }
+.pw-field .input { padding-inline-end: 52px; }
+.pw-toggle {
+  position: absolute; inset-inline-end: 8px; top: 50%; transform: translateY(-50%);
+  background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 6px 8px; font: inherit; font-size: .85rem;
+}
+.pw-toggle:hover { color: var(--teal); }
+
+@media (max-width: 480px) {
+  .auth-card { padding: 24px 18px; }
+}

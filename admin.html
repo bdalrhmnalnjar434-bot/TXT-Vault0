@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>لوحة الإدارة — TXT Vault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="CSS/style.css" />
+  <link rel="stylesheet" href="CSS/animations.css" />
+  <link rel="stylesheet" href="CSS/extra.css" />
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <header class="nav">
+    <div class="container">
+      <a class="brand" href="admin.html"><span class="brand-mark">T</span> لوحة الإدارة</a>
+      <nav class="nav-actions">
+        <span id="whoami" class="badge badge-neutral" hidden></span>
+        <button class="btn" id="logoutBtn" type="button">تسجيل الخروج</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <div id="loading" class="center-screen"><span class="spinner"></span></div>
+
+    <div id="app" hidden>
+      <div class="grid grid-4" id="stats" style="margin-bottom:24px"></div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="students" role="tab">الطلاب</button>
+        <button class="tab" data-tab="content" role="tab">الفصول والمحتوى</button>
+        <button class="tab" data-tab="trash" role="tab">🗑️ سلة المحذوفات</button>
+        <button class="tab" data-tab="log" role="tab">📋 السجل</button>
+      </div>
+
+      <!-- ===== الطلاب ===== -->
+      <section id="tab-students">
+        <div class="card" style="margin-bottom:16px">
+          <div class="row">
+            <div class="grow"><input class="input" id="search" type="search" placeholder="بحث بالاسم أو البريد..." /></div>
+            <div style="min-width:170px">
+              <select id="statusFilter" aria-label="فلترة بالحالة">
+                <option value="">كل الحالات</option>
+                <option value="pending">بانتظار الموافقة</option>
+                <option value="approved">مفعّل</option>
+                <option value="rejected">مرفوض</option>
+                <option value="suspended">موقوف</option>
+              </select>
+            </div>
+            <div style="min-width:170px">
+              <select id="gradeFilter" aria-label="فلترة بالصف">
+                <option value="">كل الصفوف</option>
+                <option value="first">أولى بكالوريا</option>
+                <option value="second">ثانية بكالوريا</option>
+              </select>
+            </div>
+            <button class="btn btn-sm" id="reloadStudents" type="button">تحديث</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>الطالب</th><th>الصف</th><th>الحالة</th><th>تيليجرام</th><th>التسجيل</th><th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="studentsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== المحتوى ===== -->
+      <section id="tab-content" hidden>
+        <div class="card" style="margin-bottom:16px">
+          <h3>إضافة فصل جديد</h3>
+          <form id="sectionForm" class="row" style="margin-top:12px" novalidate>
+            <div style="min-width:160px">
+              <select id="secGrade" aria-label="الصف">
+                <option value="first">أولى بكالوريا</option>
+                <option value="second">ثانية بكالوريا</option>
+                <option value="private">خاصة</option>
+              </select>
+            </div>
+            <div style="min-width:140px" id="secSubjectBox">
+              <select id="secSubject" aria-label="المادة"></select>
+            </div>
+            <div class="grow"><input class="input" id="secTitle" placeholder="عنوان الفصل، مثل: الفصل الرابع" maxlength="120" required /></div>
+            <div style="width:100px"><input class="input" id="secPos" type="number" min="0" value="0" aria-label="الترتيب" title="الترتيب" /></div>
+            <button class="btn btn-primary" type="submit">إضافة</button>
+          </form>
+          <div class="hint">الفصل الجديد في أولى/ثانية يُمنح تلقائيًا للطلاب الموافق عليهم في نفس الصف. فصول «خاصة» تُمنح لكل طالب يدويًا من زر «الفصول» في صفحة الطلاب.</div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="vis-bar" id="visBar"></div>
+          <div class="hint">إخفاء قسم يمنع الطلاب من رؤية كل فصوله فورًا، وإظهاره يرجّعه كما كان.</div>
+        </div>
+
+        <div class="row" style="margin-bottom:16px">
+          <div style="min-width:170px">
+            <select id="cGrade" aria-label="فلترة بالصف">
+              <option value="">كل الصفوف</option>
+              <option value="first">أولى بكالوريا</option>
+              <option value="second">ثانية بكالوريا</option>
+              <option value="private">خاصة</option>
+            </select>
+          </div>
+          <div style="min-width:170px"><select id="cSubject" aria-label="فلترة بالمادة"><option value="">كل المواد</option></select></div>
+          <div class="grow"><input class="input" id="cSearch" type="search" placeholder="بحث باسم الفصل أو الملف..." /></div>
+        </div>
+
+        <div id="sectionsList" class="grid" style="gap:16px"></div>
+      </section>
+
+      <!-- ===== السلة ===== -->
+      <section id="tab-trash" hidden>
+        <div class="row" style="margin-bottom:12px;justify-content:space-between">
+          <p class="mini" style="margin:0">الملفات المحذوفة تبقى هنا حتى تحذفها نهائيًا. الطلاب لا يرونها.</p>
+          <button class="btn btn-sm btn-danger" id="emptyTrash" type="button">إفراغ السلة</button>
+        </div>
+        <div id="trashList" class="list"></div>
+      </section>
+
+      <!-- ===== السجل ===== -->
+      <section id="tab-log" hidden>
+        <div class="row" style="margin-bottom:12px">
+          <div class="grow"><input class="input" id="logSearch" type="search" placeholder="بحث باسم الطالب أو الملف..." /></div>
+          <button class="btn btn-sm" id="reloadLog" type="button">تحديث</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>الوقت</th><th>الطالب</th><th>الإجراء</th><th>الملف</th></tr></thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+        <p class="mini">آخر 200 عملية.</p>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="JS/admin.js" onerror="document.body.insertAdjacentHTML('afterbegin','<div style=&quot;position:relative;z-index:99;margin:16px;padding:16px;border-radius:12px;background:#3b1020;color:#ffd5db;border:1px solid #fb7185;font-family:Cairo,sans-serif;line-height:1.8&quot;>تعذّر تحميل ملفات الموقع. افتح الموقع عبر Live Server (عنوان يبدأ بـ http://127.0.0.1) وليس بالضغط المزدوج على الملف، وتأكد من اتصال الإنترنت.</div>')"></script>
+</body>
+</html>
