@@ -33,7 +33,9 @@ async function loadStudents() {
     .select("*, telegram_links(telegram_username, telegram_id, channel_member, phone_verified, phone)")
     .order("created_at", { ascending: false });
   if (error) { toast("تعذّر تحميل الطلاب", "bad"); return; }
-  students = data;
+  const { data: sess } = await supabase.auth.getSession();
+  const myId = sess?.session?.user?.id;
+  students = data.filter((s) => s.id !== myId);
   renderStats();
   renderStudents();
 }
