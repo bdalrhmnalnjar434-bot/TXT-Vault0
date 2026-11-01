@@ -1,0 +1,51 @@
+/* =====================================================================
+   TXT Vault — الحركات والانتقالات
+   ===================================================================== */
+
+@keyframes fadeUp   { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popIn    { from { opacity: 0; transform: scale(.92) translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes toastIn  { from { opacity: 0; transform: translateX(-24px); } to { opacity: 1; transform: none; } }
+@keyframes spin     { to { transform: rotate(360deg); } }
+@keyframes float    { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -26px, 0) scale(1.06); } }
+@keyframes floatAlt { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(-30px, 22px, 0) scale(.94); } }
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 16px var(--teal-glow); }
+  50%      { box-shadow: 0 0 38px rgba(45, 226, 230, .65); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* حركة الكرات الخلفية */
+.bg-orbs span:nth-child(1) { animation: float 11s ease-in-out infinite; }
+.bg-orbs span:nth-child(2) { animation: floatAlt 14s ease-in-out infinite; }
+.bg-orbs span:nth-child(3) { animation: float 17s ease-in-out infinite reverse; }
+
+/* ظهور تدريجي عند التمرير (يضيف animations.js الصنف .in) */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s cubic-bezier(.2, .8, .2, 1); transition-delay: var(--d, 0s); }
+.reveal.in { opacity: 1; transform: none; }
+
+/* ظهور فوري عند تحميل الصفحة */
+.enter { animation: fadeUp .8s cubic-bezier(.2, .8, .2, 1) both; animation-delay: var(--d, 0s); }
+
+.brand-mark { animation: pulseGlow 3.2s ease-in-out infinite; }
+.btn-primary { background-size: 200% 100%; }
+.btn-primary:hover { animation: shimmer 1.6s linear infinite; background-image: linear-gradient(110deg, var(--teal) 30%, #8ffcff 50%, var(--teal) 70%); }
+.step.current { animation: pulseGlow 2.8s ease-in-out infinite; }
+
+.skeleton {
+  border-radius: 12px; min-height: 56px;
+  background: linear-gradient(110deg, rgba(255,255,255,.04) 30%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.04) 70%);
+  background-size: 200% 100%; animation: shimmer 1.4s linear infinite;
+}
+
+/* احترام إعدادات تقليل الحركة في الجهاز */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important; scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+}
