@@ -102,6 +102,15 @@
 
         <div class="card" style="margin-bottom:16px">
           <div class="vis-bar" id="visBar"></div>
+          <div class="card owner-only" id="maintBox" hidden style="margin:12px 0">
+            <div class="row" style="justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+              <strong>🛠️ وضع الصيانة (قفل الموقع عن الطلاب)</strong>
+              <label class="switch" id="maintSwitch"><input type="checkbox" id="maintOn" /> مقفول</label>
+            </div>
+            <textarea id="maintMsg" rows="2" maxlength="500" placeholder="الرسالة اللي هتظهر للطلاب (مثلًا: تحت الصيانة لحد الساعة 8 مساءً)" style="width:100%;margin-top:8px"></textarea>
+            <button class="btn btn-sm btn-primary" id="maintSave" type="button" style="margin-top:8px">حفظ</button>
+            <p class="hint" style="margin:6px 0 0">المشرفون يفضلوا يدخلوا عادي. الطلاب بيشوفوا الرسالة بس ومفيش فصول بتفتح.</p>
+          </div>
           <div class="hint">إخفاء قسم يمنع الطلاب من رؤية كل فصوله فورًا، وإظهاره يرجّعه كما كان.</div>
         </div>
 
