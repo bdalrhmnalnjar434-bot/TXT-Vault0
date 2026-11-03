@@ -1,6 +1,7 @@
 import { supabase, isConfigured, TELEGRAM_BOT_USERNAME } from "../supabase.js";
 import { getSession, getProfile, routeAfterLogin, arabicAuthError, STATUS_MESSAGE } from "./auth.js";
 import { bindSupport } from "./support.js";
+import { getMaintenance } from "./maintenance.js";
 import { showAlert, hideAlert, setBusy, initPasswordToggles } from "./ui.js";
 
 const form = document.getElementById("loginForm");
@@ -77,3 +78,6 @@ form.addEventListener("submit", async (event) => {
     setBusy(submitBtn, false);
   }
 });
+
+// أثناء الصيانة: نعرض تنبيهًا (الدخول متاح للمشرفين فقط، والطلاب سيرون رسالة الصيانة)
+getMaintenance().then((m) => { if (m.on) showAlert(messageEl, "🛠️ " + (m.message || "الموقع تحت الصيانة حاليًا.") + "\n(الدخول للمشرفين فقط حاليًا)", "warn"); });
