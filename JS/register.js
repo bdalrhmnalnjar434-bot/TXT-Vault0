@@ -1,4 +1,5 @@
 import { supabase, isConfigured } from "../supabase.js";
+import { guardPublicPage } from "./maintenance.js";
 import { arabicAuthError, getSession, getProfile, checkAdmin, routeAfterLogin } from "./auth.js";
 import { bindSupport } from "./support.js";
 import { showAlert, hideAlert, setBusy, initPasswordToggles } from "./ui.js";
@@ -163,3 +164,5 @@ form.addEventListener("submit", async (event) => {
     setBusy(submitBtn, false);
   }
 });
+
+guardPublicPage({ loginLink: true });
