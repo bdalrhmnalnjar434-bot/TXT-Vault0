@@ -74,6 +74,6 @@
   <footer><div class="container">© TXT Vault — جميع الحقوق محفوظة</div></footer>
 
   <script type="module" src="JS/animations.js"></script>
-  <script type="module">import { bindSupport } from "./JS/support.js"; bindSupport();</script>
+  <script type="module">import { bindSupport } from "./JS/support.js"; import { guardPublicPage } from "./JS/maintenance.js"; bindSupport(); guardPublicPage();</script>
 </body>
 </html>
