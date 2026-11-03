@@ -310,3 +310,7 @@ html.lite { scroll-behavior: auto; }
   .bg-orbs span, .brand-mark, .step.current, .enter { animation: none !important; }
   .reveal { opacity: 1; transform: none; transition: none; }
 }
+
+/* وضع الصيانة */
+.maintenance-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg,#06142b)}
+html.under-maintenance body{overflow:hidden}
