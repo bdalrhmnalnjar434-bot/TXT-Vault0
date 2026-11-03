@@ -3,6 +3,7 @@ import { requireUser, bindLogout, STATUS_LABEL } from "./auth.js";
 import { $, esc, toast, setBusy, openModal, copyText, downloadText, debounce } from "./ui.js";
 import { initReveal } from "./animations.js";
 import { bindSupport } from "./support.js";
+import { getMaintenance } from "./maintenance.js";
 import {
   BUCKET, KIND_LABEL, KIND_ICON, fmtSize, sortContent, applyWatermark, watermarkBackground,
 } from "./common.js";
@@ -460,3 +461,6 @@ document.addEventListener("click", (e) => {
 
   if (!isActive()) startPolling();
 })();
+
+// لو المشرف شغّل الصيانة والطالب فاتح الصفحة: نحدّث ليظهر له الإشعار
+setInterval(async () => { if ((await getMaintenance()).on) location.reload(); }, 30000);
