@@ -120,8 +120,9 @@ document.getElementById("otherGoogle")?.addEventListener("click", async (e) => {
   gStep.hidden = true;
   form.hidden = false;
   document.getElementById("email").value = session.user.email || "";
-  const guess = (profile?.full_name || "").trim();
-  if (guess) document.getElementById("fullName").value = guess;
+  // لا نملأ الاسم من حساب Google: الطالب يكتب اسمه الثلاثي بنفسه
+  const nameInput = document.getElementById("fullName");
+  nameInput.value = "";
 })();
 
 form.addEventListener("submit", async (event) => {
