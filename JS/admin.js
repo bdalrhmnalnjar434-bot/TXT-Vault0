@@ -1594,7 +1594,27 @@ async function initOwner() {
   isOwner = owner === true;
   if (isOwner) $("#tabAdminsBtn").hidden = false;
   $$(".owner-only").forEach((b) => { b.hidden = !isOwner; });
+  if (isOwner) loadMaintenance();
 }
+
+/* ------------------------------ وضع الصيانة (للمالك) ------------------------------ */
+async function loadMaintenance() {
+  const { data } = await supabase.rpc("get_maintenance");
+  if (!data) return;
+  $("#maintOn").checked = !!data.on;
+  $("#maintSwitch").classList.toggle("on", !!data.on);
+  $("#maintMsg").value = data.message || "";
+}
+$("#maintSave").addEventListener("click", async (e) => {
+  const on = $("#maintOn").checked;
+  const btn = e.currentTarget;
+  setBusy(btn, true, "جارٍ الحفظ...");
+  const { error } = await supabase.rpc("set_maintenance", { p_on: on, p_message: $("#maintMsg").value.trim() });
+  setBusy(btn, false);
+  if (error) return toast("فشل الحفظ (هل شغّلت migration_13؟)", "bad");
+  $("#maintSwitch").classList.toggle("on", on);
+  toast(on ? "🔒 الموقع اتقفل عن الطلاب" : "✅ الموقع اتفتح للطلاب");
+});
 
 async function loadAdmins() {
   const { data, error } = await supabase.rpc("owner_list_admins");
