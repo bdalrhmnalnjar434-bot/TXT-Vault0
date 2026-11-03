@@ -190,9 +190,11 @@ const PLATFORMS = [
   { name: "JavaScript", price: 100 },
   { name: "Python", price: 50 },
   { name: "الثقافة المالية", price: 100 },
+  { name: "المنصة كاملة (JavaScript + Python + الثقافة المالية)", price: 150 }, // باقة الثلاث منصات
 ];
-// أولى: JavaScript فقط، ثانية: الثلاثة
-const GRADE_PLATFORMS: Record<string, number[]> = { first: [0], second: [0, 1, 2] };
+const BUNDLE = 3;
+// أولى: JavaScript فقط، ثانية: الثلاثة + الباقة الكاملة
+const GRADE_PLATFORMS: Record<string, number[]> = { first: [0], second: [0, 1, 2, 3] };
 
 async function vipGradeOf(tgId: number): Promise<string | null> {
   const { data: link } = await db.from("telegram_links").select("user_id").eq("telegram_id", tgId).maybeSingle();
@@ -213,8 +215,12 @@ async function vipAskGrade(chatId: number) {
 async function vipShowPlatforms(chatId: number, grade: string) {
   const idx = GRADE_PLATFORMS[grade] ?? [];
   if (idx.length === 1) return vipShowPrice(chatId, grade, idx[0]); // منصة واحدة: نعرض سعرها مباشرة
-  await say(chatId, "💎 اختار المنصة اللي عايز تعرف سعرها:", {
-    reply_markup: { inline_keyboard: idx.map((i) => [{ text: `${PLATFORMS[i].name} — ${PLATFORMS[i].price} ${CURRENCY}`, callback_data: `vp:${grade}:${i}` }]) },
+  const full = PLATFORMS[0].price + PLATFORMS[1].price + PLATFORMS[2].price;
+  await say(chatId, `💎 اختار المنصة اللي عايز تعرف سعرها:\n\n• تقدر تشترك في منصة واحدة بس (جزء من المنصة) بسعر أقل.\n• أو تاخد المنصة كاملة (الثلاث منصات) بـ ${PLATFORMS[BUNDLE].price} ${CURRENCY} بدل ${full} ${CURRENCY}.`, {
+    reply_markup: { inline_keyboard: idx.map((i) => [{
+      text: i === BUNDLE ? `⭐ المنصة كاملة (الثلاث منصات) — ${PLATFORMS[i].price} ${CURRENCY}` : `${PLATFORMS[i].name} — ${PLATFORMS[i].price} ${CURRENCY}`,
+      callback_data: `vp:${grade}:${i}`,
+    }]) },
   });
 }
 
@@ -223,7 +229,11 @@ async function vipShowPrice(chatId: number, grade: string, i: number) {
   if (!pl || !(GRADE_PLATFORMS[grade] ?? []).includes(i)) return;
   const rows: Record<string, unknown>[][] = [[{ text: "✅ أريد الاشتراك", callback_data: `vs:${grade}:${i}` }]];
   if ((GRADE_PLATFORMS[grade] ?? []).length > 1) rows.push([{ text: "↩️ رجوع للمنصات", callback_data: `vg:${grade}` }]);
-  await say(chatId, `💎 منصة ${pl.name}\nالسعر: ${pl.price} ${CURRENCY}\n\nلو حابب تشترك اضغط الزر وهيتواصل معاك المشرف.`, {
+  const full = PLATFORMS[0].price + PLATFORMS[1].price + PLATFORMS[2].price;
+  const head = i === BUNDLE
+    ? `💎 ${pl.name}\nالسعر: ${pl.price} ${CURRENCY} بدل ${full} ${CURRENCY} لو اشتريت كل منصة لوحدها (توفير ${full - pl.price} ${CURRENCY}).`
+    : `💎 منصة ${pl.name}\nالسعر: ${pl.price} ${CURRENCY}\n(ده حل جزء من المنصة بسعر أقل. والمنصة كاملة بـ ${PLATFORMS[BUNDLE].price} ${CURRENCY}.)`;
+  await say(chatId, `${head}\n\nلو حابب تشترك اضغط الزر وهيتواصل معاك المشرف.`, {
     reply_markup: { inline_keyboard: rows },
   });
 }
