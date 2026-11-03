@@ -3,6 +3,7 @@
 // (sql/schema.sql)، فحتى لو تجاوز أحدهم الواجهة لن يستطيع قراءة ما لا يحق له.
 
 import { supabase, isConfigured } from "../supabase.js";
+import { getMaintenance, showMaintenance } from "./maintenance.js";
 
 export async function getSession() {
   const { data } = await supabase.auth.getSession();
@@ -165,6 +166,10 @@ export async function requireUser({ admin = false } = {}) {
   }
 
   if (isAdmin) { location.replace("admin.html"); throw new Error("admin goes to admin page"); }
+
+  // وضع الصيانة: الطالب يرى رسالة فقط (الحماية الحقيقية في قاعدة البيانات)
+  const maint = await getMaintenance();
+  if (maint.on) { showMaintenance(maint, { loginLink: false }); throw new Error("maintenance"); }
 
   if (profileRes?.e) throw profileRes.e;
   const profile = profileRes?.p ?? null;
