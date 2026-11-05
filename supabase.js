@@ -14,6 +14,9 @@ export const SUPABASE_ANON_KEY = "sb_publishable_jZoqAZh23DpOsG5pSzKXsg_ZXvYfvq2
 export const TELEGRAM_BOT_USERNAME = "bdalrhmnalnjar434_2010_bot";
 export const TELEGRAM_CHANNEL_URL = "https://t.me/+inLoexMjf_I2ODQ0";
 
+// رقم واتساب المشرف (بصيغة دولية بدون + أو أصفار): مثال مصر 201012345678
+export const ADMIN_WHATSAPP = "201028706771";
+
 export const isConfigured =
   !SUPABASE_URL.includes("YOUR-PROJECT-ID") && !SUPABASE_ANON_KEY.includes("YOUR-ANON");
 
