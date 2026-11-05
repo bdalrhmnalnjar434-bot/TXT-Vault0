@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>صفحة الطالب — TXT Vault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0a1330" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="CSS/style.css" />
+  <link rel="stylesheet" href="CSS/animations.css" />
+  <link rel="stylesheet" href="CSS/extra.css" />
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <header class="nav">
+    <div class="container">
+      <a class="brand" href="student.html"><span class="brand-mark">T</span> TXT Vault</a>
+      <nav class="nav-actions">
+        <button class="btn" id="installBtn" type="button" hidden>⬇️ تثبيت التطبيق</button>
+        <span id="whoami" class="badge badge-neutral" hidden></span>
+        <button class="btn" id="logoutBtn" type="button">تسجيل الخروج</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <div id="loading" class="center-screen"><span class="spinner"></span></div>
+
+    <div id="app" hidden>
+      <div class="row" style="justify-content:space-between;margin-bottom:20px">
+        <div>
+          <h1 id="welcome" style="margin:0;font-size:1.7rem"></h1>
+          <p id="gradeLine" style="margin:4px 0 0;color:var(--muted)"></p>
+        </div>
+        <span id="statusBadge" class="badge"></span>
+      </div>
+
+      <section class="card" style="margin-bottom:20px;border-color:rgba(251,191,36,.45)">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><h3 style="margin:0 0 4px">💎 VIP — فتح المنصة</h3>
+            <p style="margin:0;color:var(--muted)">عايز تفتح المنصة وتعرف الأسعار؟ كلّم البوت واختار المنصة اللي تناسبك.</p></div>
+          <a class="btn btn-primary" data-vip="student" href="#">اعرف الأسعار</a>
+        </div>
+      </section>
+
+      <section class="card" style="margin-bottom:20px">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><h3 style="margin:0 0 4px">🧮 آلة حاسبة علمية</h3>
+            <p style="margin:0;color:var(--muted)">حاسبة متطورة (دوال، سجل، ذاكرة) تفتحها وقت ما تحتاج.</p></div>
+          <a class="btn" href="calculator.html">افتح الحاسبة</a>
+        </div>
+      </section>
+
+      <section id="activation" class="card reveal" style="margin-bottom:28px">
+        <h3 style="margin-bottom:4px">خطوات تفعيل الحساب</h3>
+        <p style="margin-bottom:18px">أكمل الخطوات بالترتيب ليفتح لك المحتوى.</p>
+        <div id="steps" class="steps"></div>
+
+        <div id="noTelegramBox" hidden style="margin-top:18px;border-top:1px solid var(--line,rgba(255,255,255,.12));padding-top:16px">
+          <button class="btn btn-sm" id="noTgToggle" type="button">معندكش تيليجرام؟ فعّل حسابك برقم الواتساب</button>
+          <div id="noTgForm" hidden style="margin-top:12px;max-width:420px">
+            <p class="hint" style="margin:0 0 10px">اكتب رقم واتسابك واضغط الزر، هيتفتح واتساب برسالة فيها كود — ابعتها من رقمك أنت للمشرف، وهو هيفعّل حسابك بعد ما يتأكد.</p>
+            <div class="field"><label for="noTgPhone">رقم الواتساب</label>
+              <input class="input ltr" id="noTgPhone" style="direction:ltr;text-align:start" autocomplete="tel" placeholder="01xxxxxxxxx" /></div>
+            <button class="btn btn-primary btn-sm" id="noTgSend" type="button">إرسال كود التفعيل عبر واتساب</button>
+            <div id="noTgResult" hidden style="margin-top:10px"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="content">
+        <h2 style="margin:0 0 4px">المحتوى الدراسي</h2>
+        <div id="contentBody"></div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module" src="JS/pwa.js"></script>
+  <script type="module" src="JS/student.js" onerror="document.body.insertAdjacentHTML('afterbegin','<div style=&quot;position:relative;z-index:99;margin:16px;padding:16px;border-radius:12px;background:#3b1020;color:#ffd5db;border:1px solid #fb7185;font-family:Cairo,sans-serif;line-height:1.8&quot;>تعذّر تحميل ملفات الموقع. افتح الموقع عبر Live Server (عنوان يبدأ بـ http://127.0.0.1) وليس بالضغط المزدوج على الملف، وتأكد من اتصال الإنترنت.</div>')"></script>
+</body>
+</html>

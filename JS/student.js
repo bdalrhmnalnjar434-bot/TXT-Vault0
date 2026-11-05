@@ -1,4 +1,4 @@
-import { supabase, GRADES, TELEGRAM_BOT_USERNAME, TELEGRAM_CHANNEL_URL } from "../supabase.js";
+import { supabase, GRADES, TELEGRAM_BOT_USERNAME, TELEGRAM_CHANNEL_URL, ADMIN_WHATSAPP } from "../supabase.js";
 import { requireUser, bindLogout, STATUS_LABEL } from "./auth.js";
 import { $, esc, toast, setBusy, openModal, copyText, downloadText, debounce } from "./ui.js";
 import { initReveal } from "./animations.js";
@@ -42,7 +42,8 @@ async function verifyChannel() {
 }
 
 const isActive = () =>
-  ctx.profile.status === "approved" && !!link?.telegram_id && !!link?.channel_member && !!link?.phone_verified;
+  ctx.profile.status === "approved" &&
+  (ctx.profile.manual_activation || (!!link?.telegram_id && !!link?.channel_member && !!link?.phone_verified));
 
 function renderHeader() {
   const p = ctx.profile;
@@ -55,6 +56,27 @@ function renderHeader() {
 
 function renderSteps() {
   const p = ctx.profile;
+
+  // فعّله المشرف يدويًا (بدون تيليجرام): نعرض خطوات مختصرة بس
+  if (p.manual_activation) {
+    const approved = p.status === "approved";
+    const defs = [
+      { done: true, title: "إنشاء الحساب", desc: "تم إنشاء حسابك بنجاح.", action: "" },
+      { done: true, title: "التفعيل", desc: "فعّل المشرف حسابك يدويًا، مفيش خطوات تيليجرام مطلوبة.", action: "" },
+      { done: approved, title: "موافقة الإدارة", desc: approved ? "تمت الموافقة على حسابك." : "يراجع المشرف طلبك.", action: "" },
+      { done: isActive(), title: "فتح المحتوى", desc: isActive() ? "المحتوى الخاص بصفك متاح لك أدناه." : "يفتح تلقائيًا عند إكمال الخطوات السابقة.", action: "" },
+    ];
+    const currentIdx = defs.findIndex((d) => !d.done);
+    $("#steps").innerHTML = defs.map((d, i) => `
+      <div class="step ${d.done ? "done" : i === currentIdx ? "current" : ""}">
+        <div class="step-num">${d.done ? "✓" : i + 1}</div>
+        <div class="step-body"><h4>${esc(d.title)}</h4><p>${d.desc}</p><div class="row">${d.action}</div></div>
+      </div>`).join("");
+    $("#activation").hidden = isActive();
+    $("#noTelegramBox").hidden = true;
+    return;
+  }
+
   const linked = !!link?.telegram_id;
   const member = !!link?.channel_member;
   const phone = !!link?.phone_verified;
@@ -110,7 +132,33 @@ function renderSteps() {
     </div>`).join("");
 
   $("#activation").hidden = isActive();
+  $("#noTelegramBox").hidden = linked || isActive();
 }
+
+$("#noTgToggle").addEventListener("click", () => {
+  $("#noTgForm").hidden = !$("#noTgForm").hidden;
+});
+
+$("#noTgSend").addEventListener("click", async (e) => {
+  const btn = e.currentTarget;
+  const phone = $("#noTgPhone").value.trim();
+  const digits = phone.replace(/[^0-9]/g, "");
+  if (digits.length < 8) { toast("اكتب رقم واتساب صحيح", "bad"); return; }
+  setBusy(btn, true, "جارٍ التجهيز...");
+  const { data: code, error } = await supabase.rpc("request_manual_verification", { p_phone: phone });
+  setBusy(btn, false);
+  if (error || !code) { toast("تعذّر إنشاء الكود (هل شغّل المشرف sql/migration_16.sql؟)", "bad"); return; }
+  const name = ctx.profile?.full_name || "";
+  const text = `تفعيل TXT Vault
+الاسم: ${name}
+البريد: ${ctx.user.email || ""}
+كود التحقق: ${code}`;
+  const waNum = (ADMIN_WHATSAPP || "").replace(/[^0-9]/g, "");
+  if (waNum) window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  const box = $("#noTgResult");
+  box.hidden = false;
+  box.innerHTML = `✅ الكود: <b style="color:var(--accent,#2dd4bf);font-size:1.1em">${esc(code)}</b><br>لو مفتحش واتساب لوحده، ابعت نفس الرسالة يدويًا لرقم المشرف من رقمك إنت، وبعدين استنى موافقة المشرف.`;
+});
 
 async function startLink(btn) {
   setBusy(btn, true, "جارٍ التجهيز...");

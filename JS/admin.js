@@ -60,7 +60,14 @@ function renderStats() {
 
 function tgCell(s) {
   const t = s.telegram_links;
-  if (!t || !t.telegram_id) return `<span class="badge badge-neutral">غير مربوط</span>`;
+  if (s.manual_activation) {
+    return `<span class="badge badge-approved">✅ تفعيل يدوي</span><small class="ltr" style="direction:ltr;display:block">${esc(s.manual_phone || "")}</small>`;
+  }
+  if (!t || !t.telegram_id) {
+    return s.manual_code
+      ? `<span class="badge badge-pending">📨 كود واتساب بانتظار التفعيل</span>`
+      : `<span class="badge badge-neutral">غير مربوط</span>`;
+  }
   return `
     <small>${t.telegram_username ? "@" + esc(t.telegram_username) : "مربوط"}</small>
     <span class="badge ${t.channel_member ? "badge-approved" : "badge-pending"}">${t.channel_member ? "مشترك" : "غير مشترك"}</span>
@@ -78,8 +85,61 @@ function actionsCell(s) {
   if (s.status === "suspended" || s.status === "rejected") out.push(b("approved", "تفعيل", "btn-ok"));
   out.push(b("access", "الفصول"));
   out.push(b("edit", "تعديل"));
+  out.push(s.manual_activation ? b("unmanual", "إلغاء التفعيل اليدوي") : b("manual", "📱 تفعيل يدوي (بدون تيليجرام)"));
   out.push(b("manage", "🚫 حظر / حذف", "btn-danger"));
   return `<div class="actions">${out.join("")}</div>`;
+}
+
+// تفعيل يدوي: للطالب اللي معندهوش تيليجرام. المشرف بيكتب رقمه ويفعّله بدون خطوات البوت
+function manualActivate(id) {
+  const s = students.find((x) => x.id === id);
+  if (!s) return;
+  const hasCode = !!s.manual_code;
+  const codeBlock = hasCode ? `
+    <div class="card" style="margin-bottom:14px;background:rgba(45,212,191,.08);border-color:rgba(45,212,191,.35)">
+      <b>📨 الطالب طلب كود تحقق عبر واتساب</b>
+      <p style="margin:8px 0 0">الرقم: <b class="ltr" style="direction:ltr">${esc(s.manual_phone || "—")}</b><br>
+      الكود: <b style="font-size:1.3em;color:#2dd4bf">${esc(s.manual_code)}</b></p>
+      <p class="hint" style="margin:8px 0 0">قارن الرقم والكود دول برسالة الواتساب اللي وصلتك من رقم الطالب نفسه قبل ما تفعّل.</p>
+    </div>` : `
+    <div class="card" style="margin-bottom:14px">
+      <p class="hint" style="margin:0">الطالب لسه ما طلبش كود تحقق عبر واتساب. تقدر تفعّله يدويًا برضه لو متأكد منه بطريقة تانية.</p>
+    </div>`;
+  const m = openModal("تفعيل يدوي بدون تيليجرام");
+  m.body.innerHTML = `
+    <p class="hint" style="margin:0 0 14px">هيتفتح المحتوى لـ <b>${esc(s.full_name || s.email || "")}</b> بدون ما يحتاج يربط تيليجرام أو يشترك في القناة.</p>
+    ${codeBlock}
+    <form id="manualForm" novalidate>
+      <div class="field"><label for="manualPhone">رقم هاتف الطالب</label>
+        <input class="input ltr" id="manualPhone" style="direction:ltr;text-align:start" autocomplete="off" placeholder="01xxxxxxxxx" value="${esc(s.manual_phone || "")}" /></div>
+      <label class="row" style="gap:8px;margin:10px 0 16px;cursor:pointer">
+        <input type="checkbox" id="manualConfirm" required />
+        <span>${hasCode ? "اتأكدت إن الكود ده هو نفسه اللي وصلني في رسالة واتساب من رقم الطالب." : "اتأكدت من هوية الطالب ورقمه بطريقة تانية."}</span>
+      </label>
+      <button class="btn btn-primary" type="submit">تفعيل</button>
+    </form>`;
+  $("#manualForm", m.body).addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!$("#manualConfirm", m.body).checked) { toast("أكّد مربع التحقق الأول", "bad"); return; }
+    const btn = e.submitter || $("#manualForm button", m.body);
+    setBusy(btn, true, "...");
+    const { error } = await supabase.rpc("admin_manual_activate", { p_user: id, p_phone: $("#manualPhone", m.body).value.trim() });
+    setBusy(btn, false);
+    if (error) return toast("فشل التفعيل — هل شغّلت sql/migration_15.sql و16؟", "bad");
+    toast("تم التفعيل اليدوي ✔");
+    m.close();
+    loadStudents();
+  });
+}
+
+async function unmanualActivate(id, btn) {
+  if (!confirm("إلغاء التفعيل اليدوي؟ لو الطالب لسه معندوش تيليجرام مربوط، هيتقفل عنه المحتوى.")) return;
+  setBusy(btn, true, "...");
+  const { error } = await supabase.rpc("admin_revoke_manual_activation", { p_user: id });
+  setBusy(btn, false);
+  if (error) return toast("فشل الإلغاء", "bad");
+  toast("تم إلغاء التفعيل اليدوي");
+  loadStudents();
 }
 
 function renderStudents() {
@@ -311,6 +371,8 @@ $("#studentsBody").addEventListener("click", (e) => {
     case "access": return editAccess(id);
     case "edit": return editStudent(id);
     case "manage": return manageStudent(id);
+    case "manual": return manualActivate(id);
+    case "unmanual": return unmanualActivate(id, b);
     default: return setStatus(id, b.dataset.act, b);
   }
 });

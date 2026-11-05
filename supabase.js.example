@@ -1,0 +1,31 @@
+// =====================================================================
+// supabase.js — إعداد الاتصال بـ Supabase
+// ضع هنا Project URL و anon (public) key فقط.
+// ⚠️ ممنوع وضع service_role key في أي ملف يصل للمتصفح.
+// =====================================================================
+
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm";
+
+// Supabase Dashboard → Project Settings → API
+export const SUPABASE_URL = "https://YOUR-PROJECT-ID.supabase.co";
+export const SUPABASE_ANON_KEY = "YOUR-ANON-PUBLIC-KEY";
+
+// اسم البوت (بدون @) ورابط القناة — يظهران في صفحة الطالب
+export const TELEGRAM_BOT_USERNAME = "YourBotUsername";
+export const TELEGRAM_CHANNEL_URL = "https://t.me/your_channel";
+
+// رقم واتساب المشرف لاستقبال كود التفعيل اليدوي (بدون + أو أصفار بادئة، بصيغة دولية: كود الدولة + الرقم)
+// مثال لمصر: رقم 01012345678 يبقى "201012345678"
+export const ADMIN_WHATSAPP = "201xxxxxxxxx";
+
+export const isConfigured =
+  !SUPABASE_URL.includes("YOUR-PROJECT-ID") && !SUPABASE_ANON_KEY.includes("YOUR-ANON");
+
+export const supabase = createClient(
+  isConfigured ? SUPABASE_URL : "https://placeholder.supabase.co",
+  isConfigured ? SUPABASE_ANON_KEY : "placeholder-key",
+  { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } },
+);
+
+export const GRADES = { first: "أولى بكالوريا", second: "ثانية بكالوريا" };
+export const SUBJECTS = ["JavaScript", "Python"];
