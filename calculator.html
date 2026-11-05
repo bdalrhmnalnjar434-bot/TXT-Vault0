@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>آلة حاسبة علمية — TXT Vault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#0a1330" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="CSS/style.css" />
+  <link rel="stylesheet" href="CSS/animations.css" />
+  <link rel="stylesheet" href="CSS/extra.css" />
+  <style>
+    .calc-wrap{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:18px;max-width:880px;margin:0 auto;align-items:start}
+    @media (max-width:760px){.calc-wrap{grid-template-columns:1fr}}
+    #calc{padding:16px}
+    .screen{direction:ltr;text-align:right;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 16px;margin-bottom:12px;min-height:96px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden}
+    #expr{font-size:1.25rem;color:var(--muted);word-break:break-all;min-height:1.6em}
+    #result{font-size:2.1rem;font-weight:800;word-break:break-all;min-height:1.4em}
+    #result.err{font-size:1rem;color:#fb7185}
+    #result[data-copied]::after{content:"تم النسخ ✓";font-size:.8rem;color:#2dd4bf;margin-inline-start:10px}
+    .tag{position:absolute;top:8px;left:12px;font-size:.75rem;display:flex;gap:6px}
+    .tag span{padding:2px 8px;border-radius:999px;background:rgba(45,212,191,.18);color:#2dd4bf}
+    .keys{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;direction:ltr}
+    .keys button{font:inherit;font-size:1.05rem;font-weight:700;padding:13px 4px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:inherit;cursor:pointer;touch-action:manipulation;transition:background .15s,transform .08s}
+    .keys button:hover{background:rgba(255,255,255,.14)}
+    .keys button:active{transform:scale(.95)}
+    .keys .sci{font-size:.92rem;background:rgba(56,189,248,.1)}
+    .keys .op{background:rgba(45,212,191,.16);color:#2dd4bf}
+    .keys .mem{font-size:.85rem;background:rgba(251,191,36,.1)}
+    .keys .clr{background:rgba(251,113,133,.16);color:#fb7185}
+    .keys .eq{background:linear-gradient(135deg,#2dd4bf,#38bdf8);color:#04202b;grid-column:span 2}
+    #history{max-height:430px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+    .h-item{direction:ltr;text-align:right;font:inherit;display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:inherit;cursor:pointer}
+    .h-item span{color:var(--muted);font-size:.85rem;word-break:break-all}
+    .h-item b{font-size:1.05rem}
+    .tips{font-size:.85rem;color:var(--muted);line-height:1.9}
+  </style>
+</head>
+<body>
+  <div class="bg-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <header class="nav">
+    <div class="container">
+      <a class="brand" href="index.html"><span class="brand-mark">T</span> TXT Vault</a>
+      <nav class="nav-actions">
+        <a class="btn" href="student.html">↩ صفحة الطالب</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container section">
+    <h1 style="margin:0 0 6px;text-align:center">🧮 آلة حاسبة علمية</h1>
+    <p style="text-align:center;color:var(--muted);margin:0 0 22px">اكتب بالكيبورد أو اضغط الأزرار. النتيجة بتظهر وإنت بتكتب.</p>
+
+    <div class="calc-wrap">
+      <section class="card" id="calc">
+        <div class="screen">
+          <div class="tag"><span id="memTag" hidden>M</span></div>
+          <div id="expr">0</div>
+          <div id="result"></div>
+        </div>
+        <div class="keys">
+          <button class="mem" data-a="MC" type="button">MC</button>
+          <button class="mem" data-a="MR" type="button">MR</button>
+          <button class="mem" data-a="M+" type="button">M+</button>
+          <button class="mem" data-a="M-" type="button">M−</button>
+          <button class="sci" data-a="deg" id="degBtn" type="button">DEG</button>
+
+          <button class="sci" data-t="sin(" type="button">sin</button>
+          <button class="sci" data-t="cos(" type="button">cos</button>
+          <button class="sci" data-t="tan(" type="button">tan</button>
+          <button class="sci" data-t="ln(" type="button">ln</button>
+          <button class="sci" data-t="log(" type="button">log</button>
+
+          <button class="sci" data-t="asin(" type="button">sin⁻¹</button>
+          <button class="sci" data-t="acos(" type="button">cos⁻¹</button>
+          <button class="sci" data-t="atan(" type="button">tan⁻¹</button>
+          <button class="sci" data-t="sqrt(" type="button">√</button>
+          <button class="sci" data-t="^2" type="button">x²</button>
+
+          <button class="sci" data-t="^" type="button">xʸ</button>
+          <button class="sci" data-t="!" type="button">n!</button>
+          <button class="sci" data-t="pi" type="button">π</button>
+          <button class="sci" data-t="e" type="button">e</button>
+          <button class="sci" data-t="abs(" type="button">|x|</button>
+
+          <button class="clr" data-a="C" type="button">C</button>
+          <button class="op" data-t="(" type="button">(</button>
+          <button class="op" data-t=")" type="button">)</button>
+          <button class="op" data-t="%" type="button">%</button>
+          <button class="clr" data-a="DEL" type="button">⌫</button>
+
+          <button data-t="7" type="button">7</button>
+          <button data-t="8" type="button">8</button>
+          <button data-t="9" type="button">9</button>
+          <button class="op" data-t="/" type="button">÷</button>
+          <button class="sci" data-t="ans" type="button">ans</button>
+
+          <button data-t="4" type="button">4</button>
+          <button data-t="5" type="button">5</button>
+          <button data-t="6" type="button">6</button>
+          <button class="op" data-t="*" type="button">×</button>
+          <button class="sci" data-a="neg" type="button">±</button>
+
+          <button data-t="1" type="button">1</button>
+          <button data-t="2" type="button">2</button>
+          <button data-t="3" type="button">3</button>
+          <button class="op" data-t="-" type="button">−</button>
+          <button class="sci" data-a="copy" type="button">نسخ</button>
+
+          <button data-t="0" type="button">0</button>
+          <button data-t="." type="button">.</button>
+          <button class="op" data-t="+" type="button">+</button>
+          <button class="eq" data-a="=" type="button">=</button>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h3 style="margin:0">السجل</h3>
+          <button class="btn btn-sm" data-a="clearHist" type="button">مسح</button>
+        </div>
+        <div id="history"></div>
+        <p class="tips" style="margin-top:12px">
+          • الكيبورد: أرقام وعمليات و Enter للنتيجة، Backspace للمسح، Esc لمسح الكل.<br>
+          • الضرب الضمني شغال: <code>2π</code> و <code>3(4+1)</code>.<br>
+          • اضغط على أي عملية في السجل لإعادة استخدامها.<br>
+          • DEG/RAD للتحويل بين الدرجات والراديان.
+        </p>
+      </aside>
+    </div>
+  </main>
+
+  <script type="module" src="JS/pwa.js"></script>
+  <script type="module" src="JS/calculator.js"></script>
+</body>
+</html>
